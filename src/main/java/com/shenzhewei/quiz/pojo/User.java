@@ -16,6 +16,7 @@ public class User {
     private Long id;
     private String username;
     private String password;
+    private Integer userRole; // 用户角色：0-普通用户，1-管理员
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private String address;

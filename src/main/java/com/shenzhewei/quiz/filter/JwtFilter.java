@@ -31,8 +31,14 @@ public class JwtFilter implements Filter {
         // 1、获取请求url
         String url = request.getRequestURL().toString();
 
-        // 2、判断url中是否包含login，如果包含，则说明是登录操作，放行
-        if (url.contains("login")) {
+        // 2、判断url中是否包含login或register，如果包含，则说明是登录或注册操作，放行
+        if (url.contains("login") || url.contains("register")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // Handle CORS preflight
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             chain.doFilter(request, response);
             return;
         }

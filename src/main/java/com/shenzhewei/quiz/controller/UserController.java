@@ -17,6 +17,7 @@ import java.util.Map;
  * 用户Controller
  */
 @RestController
+@RequestMapping("/api/user")
 @CrossOrigin
 public class UserController {
 
@@ -27,9 +28,10 @@ public class UserController {
      * 用户登录
      */
     @PostMapping("/login")
-    public Result<String> login(@RequestBody Map<String, String> loginData) {
-        String username = loginData.get("username");
-        String password = loginData.get("password");
+    public Result<String> login(@RequestBody Map<String, Object> loginData) {
+        String username = (String) loginData.get("username");
+        String password = (String) loginData.get("password");
+        Boolean isAdminLogin = (Boolean) loginData.get("isAdmin");
 
         if (StringUtils.isAnyBlank(username, password)) {
             return Result.error("用户名或密码为空");
@@ -37,10 +39,18 @@ public class UserController {
 
         User userResult = userService.login(username, password);
         if (userResult != null) {
+            // 如果是管理端登录，检查用户角色
+            if (Boolean.TRUE.equals(isAdminLogin)) {
+                if (userResult.getUserRole() != null && userResult.getUserRole() == 0) {
+                    return Result.error("invalid account");
+                }
+            }
+            
             // 生成 JWT token
             Claims claims = Jwts.claims();
             claims.put("id", userResult.getId());
             claims.put("username", userResult.getUsername());
+            claims.put("userRole", userResult.getUserRole());
 
             String token = JwtUtil.generateTokenWithClaims(claims);
             return Result.success("用户登录成功", token);
@@ -50,7 +60,7 @@ public class UserController {
     }
 
     /**
-     * 用户注册
+     * 用户注册（用户端专用）
      */
     @PostMapping("/register")
     public Result<String> register(@RequestBody Map<String, String> registerData) {
@@ -58,36 +68,20 @@ public class UserController {
         String password = registerData.get("password");
         String checkPassword = registerData.get("checkpassword");
 
-        if (StringUtils.isAnyBlank(username, password, checkPassword)) {
-            return Result.error("用户名或密码为空");
-        }
-
-        if (!password.equals(checkPassword)) {
-            return Result.error("两次密码不一致");
-        }
-
-        try {
-            User user = new User();
-            user.setUsername(username);
-            user.setPassword(password);
-            userService.addUser(user);
-            return Result.success("注册成功");
-        } catch (RuntimeException e) {
-            return Result.error(e.getMessage());
-        }
+        return userService.register(username, password, checkPassword);
     }
 
     /**
-     * 新增用户
+     * 新增用户（管理端专用）
      */
-    @PostMapping("/user")
-    public Result<String> addUser(@RequestBody User user) {
-        try {
-            userService.addUser(user);
-            return Result.success("添加用户成功");
-        } catch (RuntimeException e) {
-            return Result.error(e.getMessage());
-        }
+    @PostMapping("/addUser")
+    public Result<String> addUser(@RequestBody Map<String, String> userData) {
+        String username = userData.get("username");
+        String password = userData.get("password");
+        String checkPassword = userData.get("checkpassword");
+        String role = userData.get("userrole");
+
+        return userService.addUser(username, password, checkPassword, role);
     }
 
     /**

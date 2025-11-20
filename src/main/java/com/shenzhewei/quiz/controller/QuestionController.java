@@ -13,6 +13,7 @@ import java.util.List;
  * 题目Controller
  */
 @RestController
+@RequestMapping("/api/question")
 @CrossOrigin
 public class QuestionController {
 
