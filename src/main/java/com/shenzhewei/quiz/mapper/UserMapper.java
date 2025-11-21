@@ -14,14 +14,15 @@ public interface UserMapper {
         /**
          * 新增用户
          */
-        @Insert("INSERT INTO `user`(username, password, address, deleted) VALUES(#{username}, #{password}, #{address}, 0)")
+        @Insert("INSERT INTO `user`(username, password, user_role, address, deleted) VALUES(#{username}, #{password}, #{userRole}, #{address}, 0)")
         void insert(User user);
 
         /**
          * 根据用户名查询用户
          */
-        @Select("SELECT id, username, password, create_time, update_time, address, deleted FROM `user` WHERE username = #{username} AND deleted = 0")
+        @Select("SELECT id, username, password, user_role, create_time, update_time, address, deleted FROM `user` WHERE username = #{username} AND deleted = 0")
         @Results({
+                        @Result(column = "user_role", property = "userRole"),
                         @Result(column = "create_time", property = "createTime"),
                         @Result(column = "update_time", property = "updateTime")
         })
@@ -30,8 +31,9 @@ public interface UserMapper {
         /**
          * 根据用户名和密码查询用户（用于登录）
          */
-        @Select("SELECT id, username, password, create_time, update_time, address, deleted FROM `user` WHERE username = #{username} AND password = #{password} AND deleted = 0")
+        @Select("SELECT id, username, password, user_role, create_time, update_time, address, deleted FROM `user` WHERE username = #{username} AND password = #{password} AND deleted = 0")
         @Results({
+                        @Result(column = "user_role", property = "userRole"),
                         @Result(column = "create_time", property = "createTime"),
                         @Result(column = "update_time", property = "updateTime")
         })
@@ -40,8 +42,9 @@ public interface UserMapper {
         /**
          * 根据id查询用户
          */
-        @Select("SELECT id, username, password, create_time, update_time, address, deleted FROM `user` WHERE id = #{id} AND deleted = 0")
+        @Select("SELECT id, username, password, user_role, create_time, update_time, address, deleted FROM `user` WHERE id = #{id} AND deleted = 0")
         @Results({
+                        @Result(column = "user_role", property = "userRole"),
                         @Result(column = "create_time", property = "createTime"),
                         @Result(column = "update_time", property = "updateTime")
         })
@@ -63,7 +66,7 @@ public interface UserMapper {
          * 分页查询用户（支持用户名模糊查询）
          */
         @Select("<script>" +
-                        "SELECT id, username, password, create_time, update_time, address, deleted FROM `user` WHERE deleted = 0 "
+                        "SELECT id, username, password, user_role, create_time, update_time, address, deleted FROM `user` WHERE deleted = 0 "
                         +
                         "<if test='username != null and username != \"\"'>" +
                         "AND username LIKE CONCAT('%', #{username}, '%') " +
@@ -72,6 +75,7 @@ public interface UserMapper {
                         "LIMIT #{pageSize} OFFSET #{offset}" +
                         "</script>")
         @Results({
+                        @Result(column = "user_role", property = "userRole"),
                         @Result(column = "create_time", property = "createTime"),
                         @Result(column = "update_time", property = "updateTime")
         })
@@ -93,6 +97,6 @@ public interface UserMapper {
         /**
          * 更新用户信息
          */
-        @Update("UPDATE `user` SET username = #{username}, password = #{password}, address = #{address} WHERE id = #{id}")
+        @Update("UPDATE `user` SET username = #{username}, password = #{password}, address = #{address}, user_role = #{userRole} WHERE id = #{id}")
         void update(User user);
 }

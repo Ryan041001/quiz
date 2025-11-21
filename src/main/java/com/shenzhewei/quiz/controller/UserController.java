@@ -173,4 +173,13 @@ public class UserController {
         userService.updateUser(user);
         return Result.success("更新用户成功");
     }
+
+    /**
+     * 重置密码
+     */
+    @PutMapping("/resetPassword")
+    public Result<String> resetPassword(@RequestParam Long id) {
+        userService.resetPassword(id);
+        return Result.success("重置密码成功");
+    }
 }

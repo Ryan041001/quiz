@@ -142,4 +142,15 @@ public class UserServiceImpl implements UserService {
             return Result.error(e.getMessage());
         }
     }
+
+    @Override
+    public void resetPassword(Long id) {
+        User user = userMapper.findById(id);
+        if (user != null) {
+            // 重置密码为 123456
+            String encryptedPassword = DigestUtils.md5DigestAsHex((SALT + "123456").getBytes());
+            user.setPassword(encryptedPassword);
+            userMapper.update(user);
+        }
+    }
 }

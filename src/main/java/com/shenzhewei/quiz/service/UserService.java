@@ -30,6 +30,11 @@ public interface UserService {
     Result<String> addUser(String username, String password, String checkPassword, String role);
 
     /**
+     * 重置密码
+     */
+    void resetPassword(Long id);
+
+    /**
      * 检查用户名是否存在
      */
     boolean usernameExists(String username);
